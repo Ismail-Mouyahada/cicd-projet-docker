@@ -25,7 +25,9 @@ jobs:
         run: npm ci --prefer-offline
 
       - name: vérifie les vulnérabilités
-        run: npm audit --audit-level=moderate
+        run: | 
+         npm audit fix --force
+         npm audit --audit-level=moderate
       - name: vérifie le code
         run: npm run lint
     # On pourrait lancer des tests unitaires ici
