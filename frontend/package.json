@@ -19,7 +19,7 @@
     "vee-validate": "^4.11.3",
     "vue": "^3.3.4",
     "vue-router": "^4.2.4",
-    "zod": "^3.22.2"
+    "zod": "^3.22.3"
   },
   "devDependencies": {
     "@cypress/code-coverage": "^3.12.0",
