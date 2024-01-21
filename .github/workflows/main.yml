@@ -75,10 +75,10 @@ jobs:
       matrix:
         include:
           - path: 'frontend'
-            full_image_name: ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')/frontend
+            full_image_name: ghcr.io/ismail-mouyahada/cicd-projet-docker/frontend
           - path: 'node-api'
  
-            full_image_name: ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')/node-api
+            full_image_name: ghcr.io/ismail-mouyahada/cicd-projet-docker/node-api
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
