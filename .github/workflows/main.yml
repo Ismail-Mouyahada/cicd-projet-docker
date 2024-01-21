@@ -57,7 +57,9 @@ jobs:
         run: npm run lint
 
       - name: vérifie les vulnérabilités
-        run: npm audit --audit-level=moderate
+        run: | 
+            npm audit fix --force
+            npm audit --audit-level=moderate
 
       - name: Upload du rapport de couverture sur Codecov
         uses: codecov/codecov-action@v3
