@@ -148,5 +148,5 @@ jobs:
         mkdir -p ~/.ssh
         ssh-keyscan -H ${{ env.SERVER_IP }} >> ~/.ssh/known_hosts
         scp docker-compose.prod.yml ${{ env.SERVER_USER }}@${{ env.SERVER_IP }}:/root/docker-compose.prod.yml
-        ssh ${{ env.SERVER_USER }}@${{ env.SERVER_IP }} "docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} &&
+        ssh ${{ secrets.SSH_USER}}@${{secrets.SSH_HOST }} "docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} &&
           docker compose -f /root/docker-compose.prod.yml up -d --force-recreate"
