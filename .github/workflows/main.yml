@@ -26,7 +26,7 @@ jobs:
     # Étapes du job
     steps:
       - name: Checkout code  # Récupère le code source
-        uses: actions/checkout@v4  # Utilise l'action GitHub pour le checkout
+        uses: actions/checkout@v3  # Utilise l'action GitHub pour le checkout
 
       - name: Mise en place de Buildx  # Configure Docker Buildx
         uses: docker/setup-buildx-action@v3  # Utilise l'action Buildx
