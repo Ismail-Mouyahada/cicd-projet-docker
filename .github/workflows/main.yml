@@ -75,9 +75,10 @@ jobs:
       matrix:
         include:
           - path: 'frontend'
-            full_image_name: ghcr.io/${{ github.repository }}/frontend
+            full_image_name: ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')/frontend
           - path: 'node-api'
-            full_image_name: ghcr.io/${{ github.repository }}/node-api
+ 
+            full_image_name: ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')/node-api
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
