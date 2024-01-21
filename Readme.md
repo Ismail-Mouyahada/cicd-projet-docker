@@ -1,0 +1,1 @@
+[![CI/CD avec images Docker et Docker Compose](https://github.com/Ismail-Mouyahada/cicd-projet-docker/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/Ismail-Mouyahada/cicd-projet-docker/actions/workflows/main.yml)
