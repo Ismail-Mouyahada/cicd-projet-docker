@@ -1,3 +1,5 @@
+# name: CI/CD avec images Docker et Docker Compose
+ 
 name: CI/CD avec images Docker et Docker Compose
 
 on:
@@ -12,25 +14,22 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - name: checkout le code
-        uses: actions/checkout@v4
+    - name: checkout le code
+      uses: actions/checkout@v4
 
-      - name: installer Node.js
-        uses: actions/setup-node@v3
-        with:
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
+    - name: installer Node.js
+      uses: actions/setup-node@v3
+      with:
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
 
-      - name: installer les dépendances
-        run: npm ci --prefer-offline
+    - name: installer les dépendances
+      run: npm ci --prefer-offline
 
-      - name: vérifie les vulnérabilités
-        run: | 
-         npm audit fix --force
-         npm audit --audit-level=moderate
-      - name: vérifie le code
-        run: npm run lint
-    # On pourrait lancer des tests unitaires ici
+    - name: vérifie les vulnérabilités
+      run: npm audit --audit-level=moderate
+    - name: vérifie le code
+      run: npm run lint
 
   tests_backend:
     runs-on: ubuntu-latest
@@ -38,33 +37,33 @@ jobs:
       run:
         working-directory: node-api
     steps:
-      - name: checkout le code
-        uses: actions/checkout@v4
+    - name: checkout le code
+      uses: actions/checkout@v4
 
-      - name: installer Node.js
-        uses: actions/setup-node@v3 # défaut = LTS
-        with:
-          cache: 'npm'
-          cache-dependency-path: node-api/package-lock.json
+    - name: installer Node.js
+      uses: actions/setup-node@v3
+      with:
+        cache: 'npm'
+        cache-dependency-path: node-api/package-lock.json
 
-      - name: installer les dépendances
-        run: npm ci --prefer-offline
+    - name: installer les dépendances
+      run: npm ci --prefer-offline
 
-      - name: exécute les tests
-        run: npm run test:ci
+    - name: exécute les tests
+      run: npm run test:ci
 
-      - name: vérifie le code
-        run: npm run lint
+    - name: vérifie le code
+      run: npm run lint
 
-      - name: vérifie les vulnérabilités
-        run: | 
-            npm audit fix --force
-            npm audit --audit-level=moderate
+    - name: vérifie les vulnérabilités
+      run: |
+        cd node-api
+        npm audit --audit-level=moderate
 
-      - name: Upload du rapport de couverture sur Codecov
-        uses: codecov/codecov-action@v3
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    - name: Upload du rapport de couverture sur Codecov
+      uses: codecov/codecov-action@v3
+      env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
   build:
     needs: [tests_frontend, tests_backend]
@@ -75,10 +74,9 @@ jobs:
       matrix:
         include:
           - path: 'frontend'
-            full_image_name: ghcr.io/ismail-mouyahada/cicd-projet-docker/frontend
+            full_image_name: ghcr.io/${{ github.repository }}/frontend
           - path: 'node-api'
- 
-            full_image_name: ghcr.io/ismail-mouyahada/cicd-projet-docker/node-api
+            full_image_name: ghcr.io/${{ github.repository }}/node-api
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -107,3 +105,131 @@ jobs:
           context: ./${{ matrix.path }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  e2e:
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login sur GitHub Package Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Lancement des tests E2E
+        run: docker compose up --exit-code-from cypress --abort-on-container-exit
+      - name: Nettoyage
+        run: docker compose down -v --remove-orphans
+
+
+# on:
+#   push:
+#     branches:
+#       - main
+
+# jobs:
+#   tests_frontend:
+#     runs-on: ubuntu-latest
+#     defaults:
+#       run:
+#         working-directory: frontend
+#     steps:
+#       - name: checkout le code
+#         uses: actions/checkout@v4
+
+#       - name: installer Node.js
+#         uses: actions/setup-node@v3
+#         with:
+#           cache: 'npm'
+#           cache-dependency-path: frontend/package-lock.json
+
+#       - name: installer les dépendances
+#         run: npm ci --prefer-offline
+
+#       - name: vérifie les vulnérabilités
+#         run: | 
+#          npm audit fix --force
+#          npm audit --audit-level=moderate
+#       - name: vérifie le code
+#         run: npm run lint
+#     # On pourrait lancer des tests unitaires ici
+
+#   tests_backend:
+#     runs-on: ubuntu-latest
+#     defaults:
+#       run:
+#         working-directory: node-api
+#     steps:
+#       - name: checkout le code
+#         uses: actions/checkout@v4
+
+#       - name: installer Node.js
+#         uses: actions/setup-node@v3 # défaut = LTS
+#         with:
+#           cache: 'npm'
+#           cache-dependency-path: node-api/package-lock.json
+
+#       - name: installer les dépendances
+#         run: npm ci --prefer-offline
+
+#       - name: exécute les tests
+#         run: npm run test:ci
+
+#       - name: vérifie le code
+#         run: npm run lint
+
+#       - name: vérifie les vulnérabilités
+#         run: | 
+#             npm audit fix --force
+#             npm audit --audit-level=moderate
+
+#       - name: Upload du rapport de couverture sur Codecov
+#         uses: codecov/codecov-action@v3
+#         env:
+#           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+#   build:
+#     needs: [tests_frontend, tests_backend]
+#     runs-on: ubuntu-latest
+#     permissions:
+#       packages: write
+#     strategy:
+#       matrix:
+#         include:
+#           - path: 'frontend'
+#             full_image_name: ghcr.io/ismail-mouyahada/cicd-projet-docker/frontend
+#           - path: 'node-api'
+ 
+#             full_image_name: ghcr.io/ismail-mouyahada/cicd-projet-docker/node-api
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
+
+#       - name: Mise en place de Buildx
+#         uses: docker/setup-buildx-action@v3
+
+#       - name: Login sur GitHub Package Registry
+#         uses: docker/login-action@v3
+#         with:
+#           registry: ghcr.io
+#           username: ${{ github.actor }}
+#           password: ${{ secrets.GITHUB_TOKEN }}
+
+#       - name: Récupération des métadonnées
+#         id: metadata
+#         uses: docker/metadata-action@v5
+#         with:
+#           images: ${{ matrix.full_image_name }}
+
+#       - name: Build et push
+#         uses: docker/build-push-action@v5
+#         with:
+#           push: true
+#           tags: ${{ matrix.full_image_name }}:latest
+#           context: ./${{ matrix.path }}
+#           cache-from: type=gha
+#           cache-to: type=gha,mode=max
