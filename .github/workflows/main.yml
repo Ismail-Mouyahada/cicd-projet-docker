@@ -12,9 +12,9 @@ jobs:
             matrix:
                 include:
                   - context: ./fontend
-                    image_name: ghcr.io/ismail-mouyahada/cicd-projet-docker/frontend
+                    image_name: ghcr.io/ismail-mouyahada/cicd-projet-docker/frontend:latest
                   - context: ./node-api
-                    image_name: ghcr.io/ismail-mouyahada/cicd-projet-docker/node-api
+                    image_name: ghcr.io/ismail-mouyahada/cicd-projet-docker/node-api:latest
         permissions:
             packages: write
         steps:
@@ -27,6 +27,13 @@ jobs:
             - 
                 name: Checkout 
                 uses: actions/checkout@v3
+
+            -
+                name: Docker meta
+                id: meta
+                uses: docker/metadata-action@v5
+                with:
+                    images: ${{ matrix.image_name}}
             - 
                 name: Login to GitHub Container Registry
                 uses: docker/login-action@v3
@@ -40,6 +47,6 @@ jobs:
                 with:
                     context: ${{ matrix.context }}
                     push: true
-                    tags: ${{ matrix.image_name }}:latest
+                    tags: ${{ matrix.image_name }}
                     cache-from: type=gha
                     cache-to: type=gha, mode=max
