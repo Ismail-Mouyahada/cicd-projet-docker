@@ -12,9 +12,9 @@ jobs:
             matrix:
                 include:
                   - context: ./fontend
-                    image_name: ghcr.io/ismail-mouyahada/cicd-projet-docker/frontend:latest
+                    image_name: ghcr.io/Ismail-Mouyahada/cicd-projet-docker/frontend:latest
                   - context: ./node-api
-                    image_name: ghcr.io/ismail-mouyahada/cicd-projet-docker/node-api:latest
+                    image_name: ghcr.io/Ismail-Mouyahada/cicd-projet-docker/node-api:latest
         permissions:
             packages: write
         steps:
